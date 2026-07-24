@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rescuers - Animal Rescue & Care Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Background elements -->
+    <div class="ambient-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <!-- 1. Authentication Section -->
+    <div id="auth-section" class="auth-wrapper">
+        <!-- Login Card -->
+        <div id="login-card" class="auth-container glass-card">
+            <div class="auth-header">
+                <h2>Welcome to Rescuers</h2>
+                <p>Sign in to report or manage animal distress alerts</p>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" class="form-control" placeholder="user@rescue.org" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Login</button>
+            </form>
+            <div class="auth-switch">
+                Don't have an account? <a href="#" id="auth-switch-link">Sign Up</a>
+            </div>
+        </div>
+
+        <!-- Register Card -->
+        <div id="register-card" class="auth-container glass-card" style="display: none;">
+            <div class="auth-header">
+                <h2>Join the Rescue Mission</h2>
+                <p>Register as a citizen or local rescue volunteer</p>
+            </div>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="reg-name">Full Name</label>
+                    <input type="text" id="reg-name" class="form-control" placeholder="Jane Doe" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Email Address</label>
+                    <input type="email" id="reg-email" class="form-control" placeholder="jane@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-role">Register As</label>
+                    <select id="reg-role" class="form-control" required>
+                        <option value="user">General User (Report Cases)</option>
+                        <option value="volunteer">Rescue Volunteer (Respond to Alerts)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Create Account</button>
+            </form>
+            <div class="auth-switch">
+                Already have an account? <a href="#" id="reg-switch-link">Log In</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Application Layout -->
+    <div id="app-section" class="app-container" style="display: none;">
+        
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="sidebar">
+            <div>
+                <div class="brand">
+                    <div class="brand-icon">🐾</div>
+                    <div class="brand-name">Rescuers</div>
+                </div>
+                <nav>
+                    <ul class="nav-links">
+                        <li class="nav-item active">
+                            <a href="#" data-panel="dashboard">
+                                <span>🏠</span> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item" data-role-required="volunteer" style="display: none;">
+                            <a href="#" data-panel="volunteer">
+                                <span>🚑</span> Rescue Workboard
+                            </a>
+                        </li>
+                        <li class="nav-item" data-role-required="admin" style="display: none;">
+                            <a href="#" data-panel="admin">
+                                <span>⚙️</span> Control Center
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" data-panel="guides">
+                                <span>📖</span> First Aid Guides
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Profile Info Widget -->
+            <div class="user-profile-widget">
+                <div class="profile-card">
+                    <div id="profile-avatar" class="profile-avatar">U</div>
+                    <div class="profile-details">
+                        <span id="profile-name" class="profile-name">User Name</span>
+                        <span id="profile-role" class="profile-role">role</span>
+                    </div>
+                </div>
+                <button id="logout-btn" class="btn-logout">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Body -->
+        <main class="main-content">
+            
+            <!-- Main Header -->
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Animal Rescue Portal</h1>
+                    <p>Community Driven Animal Welfare & Distress Management</p>
+                </div>
+                <div class="header-actions">
+                    <button id="theme-toggle-btn" class="theme-toggle-btn" title="Toggle Theme">☀️</button>
+                </div>
+            </header>
+
+            <!-- News Ticker -->
+            <section class="glass-card ticker-container">
+                <span class="ticker-label">Live Feeds</span>
+                <div id="ticker-text" class="ticker-text">Loading recent rescue reports and incident tickers...</div>
+            </section>
+
+            <!-- Main Statistics Grid -->
+            <section class="stats-grid">
+                <div class="stat-card glass-card">
+                    <div class="stat-icon pending">⚠️</div>
+                    <div class="stat-info">
+                        <span id="stat-pending" class="stat-value">0</span>
+                        <span class="stat-label">Pending Rescues</span>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon progress">🔄</div>
+                    <div class="stat-info">
+                        <span id="stat-progress" class="stat-value">0</span>
+                        <span class="stat-label">In Progress</span>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon rescued">💚</div>
+                    <div class="stat-info">
+                        <span id="stat-rescued" class="stat-value">0</span>
+                        <span class="stat-label">Rescued Animals</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Panel 1: User Dashboard (Default) -->
+            <div id="panel-dashboard" class="app-panel active">
+                <div class="content-grid-2">
+                    <!-- Left: Report Distress -->
+                    <div class="glass-card form-container">
+                        <h2 style="margin-top:0; font-family: var(--font-heading); font-weight:700;">Report Animal in Distress</h2>
+                        <p style="color: var(--text-muted-dark); font-size: 0.9rem; margin-bottom: 1.5rem;">Click on the map grid below to pinpoint the location, then fill details.</p>
+                        
+                        <!-- Map Grid Interactive Mockup -->
+                        <div id="mock-map" class="map-mockup">
+                            <div class="map-grid"></div>
+                            <!-- Selector Pin -->
+                            <div id="map-pin-selector" class="map-marker pending" style="display: none; z-index: 15;"></div>
+                        </div>
+                        <div class="map-instructions">
+                            <div class="map-instructions-title">💡 Map Grid Interaction</div>
+                            <div>Click on any area on the virtual grid to set the location tag automatically.</div>
+                        </div>
+
+                        <form id="report-form" style="margin-top: 1.5rem;">
+                            <div class="form-group">
+                                <label for="report-animal-type">Species / Animal Type</label>
+                                <select id="report-animal-type" class="form-control" required>
+                                    <option value="">Select animal type...</option>
+                                    <option value="Dog">Dog</option>
+                                    <option value="Cat">Cat</option>
+                                    <option value="Bird">Bird</option>
+                                    <option value="Cattle">Cattle / Cow</option>
+                                    <option value="Wildlife">Wild Animal</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="location-input">Location Address / Grid coordinates</label>
+                                <input type="text" id="location-input" class="form-control" placeholder="Select location on map, or write landmark..." required>
+                            </div>
+                            <div class="form-group">
+                                <label for="report-description">Condition Description</label>
+                                <textarea id="report-description" class="form-control" rows="3" placeholder="Explain injury/condition (e.g. bleeding from leg, trapped in drain, malnourished...)" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="report-image">Photo URL (Optional mockup)</label>
+                                <input type="text" id="report-image" class="form-control" placeholder="/static/images/mock_dog.jpg">
+                            </div>
+                            <div style="display: flex; gap: 1rem;">
+                                <button type="submit" class="btn-primary" style="flex:1;">Submit Distress Alert</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Right: User Reports History -->
+                    <div>
+                        <div class="reports-list-header">
+                            <h2 style="margin:0; font-family: var(--font-heading); font-weight:700;">Distress Incidents Feed</h2>
+                        </div>
+                        <div id="my-reports-feed" class="reports-feed">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 2: Volunteer Workboard -->
+            <div id="panel-volunteer" class="app-panel">
+                <div class="glass-card" style="padding: 2rem;">
+                    <h2 style="margin-top:0; font-family: var(--font-heading); font-weight:700;">Rescue Mission Control</h2>
+                    <p style="color: var(--text-muted-dark); font-size: 0.9rem; margin-bottom: 2rem;">Accept pending rescue alerts, head to the site, and update progress status.</p>
+                    
+                    <div id="volunteer-reports-feed" class="reports-feed">
+                        <!-- Injected dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 3: Control Center (Admin) -->
+            <div id="panel-admin" class="app-panel">
+                <!-- User lists -->
+                <div class="glass-card" style="padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="margin-top:0; font-family: var(--font-heading); font-weight:700;">User Accounts Directory</h2>
+                    <p style="color: var(--text-muted-dark); font-size: 0.9rem; margin-bottom: 1.5rem;">Registered citizens and verified volunteers database.</p>
+                    
+                    <div class="admin-table-container">
+                        <table id="admin-users-table" class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Injected dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Report lists -->
+                <div class="glass-card" style="padding: 2rem;">
+                    <h2 style="margin-top:0; font-family: var(--font-heading); font-weight:700;">All Distress Reports</h2>
+                    <p style="color: var(--text-muted-dark); font-size: 0.9rem; margin-bottom: 1.5rem;">Comprehensive incident log database.</p>
+                    
+                    <div class="admin-table-container">
+                        <table id="admin-reports-table" class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Species</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Injected dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 4: First Aid Guides -->
+            <div id="panel-guides" class="app-panel">
+                <div class="glass-card" style="padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="margin-top:0; font-family: var(--font-heading); font-weight:700;">Emergency Animal First Aid</h2>
+                    <p style="color: var(--text-muted-dark); font-size: 0.9rem; margin-bottom: 2rem;">Basic action plans to stabilize injured animals before rescue teams arrive.</p>
+                    
+                    <div class="guides-grid">
+                        <div class="glass-card guide-card">
+                            <div class="guide-icon">🐶</div>
+                            <h3>Stray Dog First Aid</h3>
+                            <p>For injured or bleeding dogs:</p>
+                            <ol class="guide-steps">
+                                <li>Assess safety: Ensure the dog is not aggressive. Offer a gentle voice.</li>
+                                <li>Stop bleeding: Apply gentle pressure using a clean cloth or bandage.</li>
+                                <li>Keep warm: Wrap in a soft towel or blanket to prevent shock.</li>
+                                <li>Report details: Take a photo and specify landmarks on our dashboard.</li>
+                            </ol>
+                        </div>
+                        <div class="glass-card guide-card">
+                            <div class="guide-icon">🐱</div>
+                            <h3>Cat Rescue Guide</h3>
+                            <p>For trapped or injured felines:</p>
+                            <ol class="guide-steps">
+                                <li>Approach carefully: Cats scratch/bite when in pain. Use thick gloves if possible.</li>
+                                <li>Secure container: Place the cat gently in a cardboard box with air holes.</li>
+                                <li>Hydration: If dehydrated, offer water, but do not force feed.</li>
+                                <li>Minimize noise: Keep in a dark, quiet place until the volunteer arrives.</li>
+                            </ol>
+                        </div>
+                        <div class="glass-card guide-card">
+                            <div class="guide-icon">🐦</div>
+                            <h3>Bird Rehabilitation</h3>
+                            <p>For wings broken or bird exhaustion:</p>
+                            <ol class="guide-steps">
+                                <li>Avoid cages: Place in a cardboard box lined with tissues or cloth.</li>
+                                <li>Handle gently: Scoop from behind, locking wings close to the body.</li>
+                                <li>Warmth is key: Keep the box in a warm location.</li>
+                                <li>Report: File a Bird alert immediately for medical volunteer pickup.</li>
+                            </ol>
+                        </div>
+                        <div class="glass-card guide-card">
+                            <div class="guide-icon">🦌</div>
+                            <h3>Wildlife & Large Animals</h3>
+                            <p>For wild birds, snakes, or cattle:</p>
+                            <ol class="guide-steps">
+                                <li>Do NOT touch: Wildlife requires professional wildlife handlers.</li>
+                                <li>Keep distance: Secure the perimeter to prevent the animal from fleeing.</li>
+                                <li>Photo detail: Note size, behavior, and landmarks.</li>
+                                <li>Call admin: Submit an urgent alert using the dashboard tag "Wildlife".</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Core App Logic -->
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
